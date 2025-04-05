@@ -83,7 +83,7 @@ export function MetaMaskConnection() {
         {/* Connection Button */}
         <div className="mb-6 flex flex-col items-center">
           <Button
-            variant={isConnected ? "success" : "default"}
+            variant="default"
             className={`w-full py-6 ${isConnected ? 'bg-green-600 hover:bg-green-700' : ''}`}
             onClick={connectWallet}
             disabled={isConnecting || isConnected}
