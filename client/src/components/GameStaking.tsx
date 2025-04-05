@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { CoinsIcon, GamepadIcon, Loader2, RefreshCcw } from 'lucide-react';
+import { GameLoadingScreen } from '@/components/GameLoadingScreen';
 
 export function GameStaking() {
   const { isConnected, account } = useMetaMask();
@@ -39,6 +40,7 @@ export function GameStaking() {
   const [isSettingWinner, setIsSettingWinner] = useState(false);
   const [isStartingNewSession, setIsStartingNewSession] = useState(false);
   const [isResettingStake, setIsResettingStake] = useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
 
   // Fetch contract data
   const fetchContractData = useCallback(async () => {
@@ -260,15 +262,21 @@ export function GameStaking() {
     // Show entering toast
     toast({
       title: "Entering Game World",
-      description: "Redirecting to Horizon Meta...",
+      description: "Preparing gaming environment...",
     });
     
-    // Redirect to Horizon Meta after a brief delay
-    setTimeout(() => {
-      // Open in a new tab
-      window.open('https://horizon.meta.com/worlds/631234523404686/?snapshot_id=1594378804596639', '_blank');
-      setIsEntering(false);
-    }, 1500);
+    // Show the loading screen
+    setShowLoadingScreen(true);
+  };
+  
+  // Handle completion of loading screen
+  const handleLoadingComplete = () => {
+    // Open the game in a new tab
+    window.open('https://horizon.meta.com/worlds/631234523404686/?snapshot_id=1594378804596639', '_blank');
+    
+    // Hide the loading screen and reset entering state
+    setShowLoadingScreen(false);
+    setIsEntering(false);
   };
   
   // Handle setting the current user as the winner
@@ -497,198 +505,205 @@ export function GameStaking() {
   };
   
   return (
-    <Card className="cyberpunk-card w-full max-w-md shadow-lg backdrop-blur-sm">
-      <CardHeader className="bg-black/40 border-b border-primary/30">
-        <CardTitle className="flex items-center gap-2 text-xl neon-text">
-          <GamepadIcon className="h-5 w-5" />
-          <span className="gradient-text font-bold">GAME STAKING PORTAL</span>
-        </CardTitle>
-        <CardDescription className="text-primary/80">
-          Stake your pSAGA tokens to enter the cybernetic realm
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="p-6 space-y-6">
-        {/* Current Stakes Section */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-primary/90">CURRENT STAKES</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-black/60 rounded-lg p-3 neon-border">
-              <div className="text-xs text-primary/70 mb-1">Your Stake</div>
-              <div className="flex items-center">
-                <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
-                <span className="font-bold text-white">
-                  {formatStake(gameState.userStake)} <span className="text-primary">pSAGA</span>
-                </span>
+    <>
+      <Card className="cyberpunk-card w-full max-w-md shadow-lg backdrop-blur-sm">
+        <CardHeader className="bg-black/40 border-b border-primary/30">
+          <CardTitle className="flex items-center gap-2 text-xl neon-text">
+            <GamepadIcon className="h-5 w-5" />
+            <span className="gradient-text font-bold">GAME STAKING PORTAL</span>
+          </CardTitle>
+          <CardDescription className="text-primary/80">
+            Stake your pSAGA tokens to enter the cybernetic realm
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="p-6 space-y-6">
+          {/* Current Stakes Section */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-primary/90">CURRENT STAKES</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-black/60 rounded-lg p-3 neon-border">
+                <div className="text-xs text-primary/70 mb-1">Your Stake</div>
+                <div className="flex items-center">
+                  <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
+                  <span className="font-bold text-white">
+                    {formatStake(gameState.userStake)} <span className="text-primary">pSAGA</span>
+                  </span>
+                </div>
+              </div>
+              
+              <div className="bg-black/60 rounded-lg p-3 neon-border">
+                <div className="text-xs text-primary/70 mb-1">Total Staked</div>
+                <div className="flex items-center">
+                  <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
+                  <span className="font-bold text-white">
+                    {formatStake(gameState.totalStaked)} <span className="text-primary">pSAGA</span>
+                  </span>
+                </div>
               </div>
             </div>
             
-            <div className="bg-black/60 rounded-lg p-3 neon-border">
-              <div className="text-xs text-primary/70 mb-1">Total Staked</div>
-              <div className="flex items-center">
-                <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
-                <span className="font-bold text-white">
-                  {formatStake(gameState.totalStaked)} <span className="text-primary">pSAGA</span>
-                </span>
+            {/* Reset Your Stake Button */}
+            {ethers.getBigInt(gameState.userStake) > ethers.getBigInt(0) && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 border-red-500/70 text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full"
+                onClick={handleResetStake}
+                disabled={!isConnected || isResettingStake}
+              >
+                {isResettingStake ? (
+                  <>
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    Resetting Stake...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCcw className="mr-1 h-3 w-3" />
+                    Reset Your Stake
+                  </>
+                )}
+              </Button>
+            )}
+            
+            {/* Current Winner Display */}
+            {gameState.currentWinner && (
+              <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3 mt-2">
+                <div className="text-xs text-yellow-400 mb-1">Current Winner</div>
+                <div className="text-sm font-mono truncate text-yellow-300">
+                  {gameState.currentWinner === account ? 'You are the Winner! 🏆' : gameState.currentWinner}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
-          {/* Reset Your Stake Button */}
-          {ethers.getBigInt(gameState.userStake) > ethers.getBigInt(0) && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2 border-red-500/70 text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full"
-              onClick={handleResetStake}
-              disabled={!isConnected || isResettingStake}
-            >
-              {isResettingStake ? (
-                <>
-                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                  Resetting Stake...
-                </>
-              ) : (
-                <>
-                  <RefreshCcw className="mr-1 h-3 w-3" />
-                  Reset Your Stake
-                </>
-              )}
-            </Button>
-          )}
+          <Separator className="bg-primary/20" />
           
-          {/* Current Winner Display */}
-          {gameState.currentWinner && (
-            <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3 mt-2">
-              <div className="text-xs text-yellow-400 mb-1">Current Winner</div>
-              <div className="text-sm font-mono truncate text-yellow-300">
-                {gameState.currentWinner === account ? 'You are the Winner! 🏆' : gameState.currentWinner}
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <Separator className="bg-primary/20" />
-        
-        {/* Set Winner Button */}
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            className="w-full border-amber-500/70 bg-amber-900/30 text-amber-300 hover:bg-amber-800/40 hover:text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.4)] font-bold tracking-wide py-5"
-            onClick={handleSetWinner}
-            disabled={!isConnected || isSettingWinner}
-          >
-            {isSettingWinner ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Setting Winner...
-              </>
-            ) : (
-              <span className="relative z-10 flex items-center justify-center">
-                <span className="mr-2">🏆</span>
-                SET ME AS WINNER
-              </span>
-            )}
-          </Button>
-          <p className="text-xs text-primary/70 text-center">
-            (For testing only: Sets your address as the game winner)
-          </p>
-        </div>
-        
-        {/* Start New Session Button (appears when a winner exists) */}
-        {gameState.currentWinner && (
-          <div className="space-y-2 mt-4">
+          {/* Set Winner Button */}
+          <div className="space-y-2">
             <Button
               variant="outline"
-              className="w-full border-emerald-500/70 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-800/40 hover:text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.4)] font-bold tracking-wide py-5"
-              onClick={handleStartNewSession}
-              disabled={!isConnected || isStartingNewSession}
+              className="w-full border-amber-500/70 bg-amber-900/30 text-amber-300 hover:bg-amber-800/40 hover:text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.4)] font-bold tracking-wide py-5"
+              onClick={handleSetWinner}
+              disabled={!isConnected || isSettingWinner}
             >
-              {isStartingNewSession ? (
+              {isSettingWinner ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Starting New Session...
+                  Setting Winner...
                 </>
               ) : (
                 <span className="relative z-10 flex items-center justify-center">
-                  <span className="mr-2">🔄</span>
-                  START NEW STAKING SESSION
+                  <span className="mr-2">🏆</span>
+                  SET ME AS WINNER
                 </span>
               )}
             </Button>
             <p className="text-xs text-primary/70 text-center">
-              Resets the game to start a new staking round
+              (For testing only: Sets your address as the game winner)
             </p>
           </div>
-        )}
-        
-        <Separator className="bg-primary/20" />
-        
-        {/* Stake Form */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-primary/90">STAKE TOKENS</h3>
           
-          <div className="grid gap-2">
-            <Label htmlFor="stake-amount" className="text-primary/80">Stake Amount</Label>
-            <div className="relative">
-              <Input
-                id="stake-amount"
-                type="text"
-                value={stakeAmount}
-                onChange={handleStakeAmountChange}
-                placeholder="0.0"
-                className="pr-12 bg-black/50 border-primary/50 text-white focus:border-primary focus:ring-primary/30"
-                disabled={!isConnected || gameState.isStaking}
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <span className="text-sm text-primary/80">pSAGA</span>
+          {/* Start New Session Button (appears when a winner exists) */}
+          {gameState.currentWinner && (
+            <div className="space-y-2 mt-4">
+              <Button
+                variant="outline"
+                className="w-full border-emerald-500/70 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-800/40 hover:text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.4)] font-bold tracking-wide py-5"
+                onClick={handleStartNewSession}
+                disabled={!isConnected || isStartingNewSession}
+              >
+                {isStartingNewSession ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Starting New Session...
+                  </>
+                ) : (
+                  <span className="relative z-10 flex items-center justify-center">
+                    <span className="mr-2">🔄</span>
+                    START NEW STAKING SESSION
+                  </span>
+                )}
+              </Button>
+              <p className="text-xs text-primary/70 text-center">
+                Resets the game to start a new staking round
+              </p>
+            </div>
+          )}
+          
+          <Separator className="bg-primary/20" />
+          
+          {/* Stake Form */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-primary/90">STAKE TOKENS</h3>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="stake-amount" className="text-primary/80">Stake Amount</Label>
+              <div className="relative">
+                <Input
+                  id="stake-amount"
+                  type="text"
+                  value={stakeAmount}
+                  onChange={handleStakeAmountChange}
+                  placeholder="0.0"
+                  className="pr-12 bg-black/50 border-primary/50 text-white focus:border-primary focus:ring-primary/30"
+                  disabled={!isConnected || gameState.isStaking}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-sm text-primary/80">pSAGA</span>
+                </div>
               </div>
             </div>
+            
+            <Button 
+              className="w-full bg-primary hover:bg-primary/90 neon-glow text-black font-bold tracking-wide py-5 text-base shadow-[0_0_15px_rgba(13,242,201,0.7)]" 
+              onClick={handleStake}
+              disabled={!isConnected || gameState.isStaking || parseFloat(stakeAmount) <= 0}
+            >
+              {gameState.isStaking ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Staking...
+                </>
+              ) : (
+                'STAKE TOKENS'
+              )}
+            </Button>
           </div>
-          
-          <Button 
-            className="w-full bg-primary hover:bg-primary/90 neon-glow text-black font-bold tracking-wide py-5 text-base shadow-[0_0_15px_rgba(13,242,201,0.7)]" 
-            onClick={handleStake}
-            disabled={!isConnected || gameState.isStaking || parseFloat(stakeAmount) <= 0}
+        </CardContent>
+        
+        <CardFooter className="bg-gradient-to-r from-primary/20 to-purple-700/20 p-6 flex flex-col border-t border-primary/30">
+          <Button
+            className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-black font-bold py-6 text-lg uppercase tracking-wider shadow-[0_0_20px_rgba(13,242,201,0.8),0_0_30px_rgba(127,58,236,0.5)]"
+            onClick={handleEnterGame}
+            disabled={!isConnected || ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) || isEntering}
           >
-            {gameState.isStaking ? (
+            {isEntering ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Staking...
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Entering...
               </>
             ) : (
-              'STAKE TOKENS'
+              <span className="relative z-10 flex items-center justify-center">
+                <span className="mr-2">🎮</span>
+                ENTER THE GAME
+              </span>
             )}
           </Button>
-        </div>
-      </CardContent>
+          
+          <p className="text-primary/80 text-xs mt-2 text-center">
+            {ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) 
+              ? 'Stake tokens to unlock game entry' 
+              : 'Click to enter the virtual realm with your current stake'}
+          </p>
+        </CardFooter>
+      </Card>
       
-      <CardFooter className="bg-gradient-to-r from-primary/20 to-purple-700/20 p-6 flex flex-col border-t border-primary/30">
-        <Button
-          className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-black font-bold py-6 text-lg uppercase tracking-wider shadow-[0_0_20px_rgba(13,242,201,0.8),0_0_30px_rgba(127,58,236,0.5)]"
-          onClick={handleEnterGame}
-          disabled={!isConnected || ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) || isEntering}
-        >
-          {isEntering ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Entering...
-            </>
-          ) : (
-            <span className="relative z-10 flex items-center justify-center">
-              <span className="mr-2">🎮</span>
-              ENTER THE GAME
-            </span>
-          )}
-        </Button>
-        
-        <p className="text-primary/80 text-xs mt-2 text-center">
-          {ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) 
-            ? 'Stake tokens to unlock game entry' 
-            : 'Click to enter the virtual realm with your current stake'}
-        </p>
-      </CardFooter>
-    </Card>
+      {/* Game Loading Screen */}
+      {showLoadingScreen && (
+        <GameLoadingScreen onLoadingComplete={handleLoadingComplete} />
+      )}
+    </>
   );
 }
