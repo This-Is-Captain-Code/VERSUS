@@ -348,9 +348,9 @@ export function GameStaking() {
     }
   };
   
-  // Handle resetting your stake (UI only)
-  const handleResetStake = () => {
-    if (!isConnected || !account) {
+  // Handle unstaking to withdraw your staked tokens
+  const handleUnstake = async () => {
+    if (!isConnected || !account || !window.ethereum) {
       toast({
         title: "Not Connected",
         description: "Please connect your wallet first",
@@ -359,33 +359,57 @@ export function GameStaking() {
       return;
     }
     
+    if (ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0)) {
+      toast({
+        title: "No Stake",
+        description: "You don't have any tokens staked to withdraw",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsResettingStake(true);
     
     try {
-      // Since there's no contract function to reset the stake, we'll just update the UI
-      setGameState(prev => ({
-        ...prev,
-        userStake: '0'
-      }));
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        GAME_CONTRACT_ADDRESS,
+        GAME_CONTRACT_ABI,
+        signer
+      );
       
-      // Store reset state in localStorage to persist across page refreshes
+      // Call the unstake function from the contract
+      const tx = await contract.unstake();
+      
+      toast({
+        title: "Transaction Submitted",
+        description: "Your unstake transaction is being processed",
+      });
+      
+      await tx.wait();
+      
+      // After unstaking, refresh the stake values from the contract
+      await fetchContractData();
+      
+      toast({
+        title: "Unstake Successful",
+        description: "Successfully withdrawn your staked tokens",
+      });
+      
+      // Clear any previous reset state
       try {
-        localStorage.setItem('gameStakeReset', 'true');
-        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
+        localStorage.removeItem('gameStakeReset');
+        localStorage.removeItem('gameStakeResetTimestamp');
       } catch (error) {
-        console.error('Error storing reset state:', error);
+        console.error('Error clearing stake reset state:', error);
       }
       
-      toast({
-        title: "Stake Reset",
-        description: "Your stake has been reset in the UI. The blockchain value remains unchanged.",
-        duration: 5000,
-      });
     } catch (error: any) {
-      console.error('Reset stake error:', error);
+      console.error('Unstake error:', error);
       toast({
-        title: "Failed to Reset Stake",
-        description: "There was an error resetting your stake in the UI.",
+        title: "Unstake Failed",
+        description: error.message || "There was an error withdrawing your tokens",
         variant: "destructive",
       });
     } finally {
@@ -544,24 +568,24 @@ export function GameStaking() {
               </div>
             </div>
             
-            {/* Reset Your Stake Button */}
+            {/* Unstake Button */}
             {ethers.getBigInt(gameState.userStake) > ethers.getBigInt(0) && (
               <Button
                 variant="outline"
                 size="sm"
                 className="mt-2 border-red-500/70 text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full"
-                onClick={handleResetStake}
+                onClick={handleUnstake}
                 disabled={!isConnected || isResettingStake}
               >
                 {isResettingStake ? (
                   <>
                     <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    Resetting Stake...
+                    Unstaking...
                   </>
                 ) : (
                   <>
                     <RefreshCcw className="mr-1 h-3 w-3" />
-                    Reset Your Stake
+                    Unstake Tokens
                   </>
                 )}
               </Button>
