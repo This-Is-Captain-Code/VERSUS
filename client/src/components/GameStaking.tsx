@@ -137,7 +137,7 @@ export function GameStaking() {
       return;
     }
     
-    // Limit to 6 decimal places (the decimals of pSAGA)
+    // Limit to 6 decimal places (the decimals of VERSUS)
     if (parts.length === 2 && parts[1].length > 6) {
       return;
     }
@@ -217,7 +217,7 @@ export function GameStaking() {
       // Success!
       toast({
         title: "Stake Successful",
-        description: `Successfully staked ${stakeAmount} pSAGA`,
+        description: `Successfully staked ${stakeAmount} VERSUS`,
       });
       
       // Force refresh from contract
@@ -256,7 +256,7 @@ export function GameStaking() {
     if (ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0)) {
       toast({
         title: "No Stake",
-        description: "You need to stake pSAGA tokens before entering the game",
+        description: "You need to stake VERSUS tokens before entering the game",
         variant: "destructive",
       });
       return;
@@ -599,7 +599,7 @@ export function GameStaking() {
             <span className="gradient-text font-bold">GAME STAKING PORTAL</span>
           </CardTitle>
           <CardDescription className="text-primary/80">
-            Stake your pSAGA tokens to enter the cybernetic realm
+            Stake your VERSUS tokens to enter the cybernetic realm
           </CardDescription>
         </CardHeader>
         
@@ -614,7 +614,7 @@ export function GameStaking() {
                 <div className="flex items-center">
                   <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
                   <span className="font-bold text-white">
-                    {formatStake(gameState.userStake)} <span className="text-primary">pSAGA</span>
+                    {formatStake(gameState.userStake)} <span className="text-primary">VERSUS</span>
                   </span>
                 </div>
               </div>
@@ -624,7 +624,7 @@ export function GameStaking() {
                 <div className="flex items-center">
                   <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
                   <span className="font-bold text-white">
-                    {formatStake(gameState.totalStaked)} <span className="text-primary">pSAGA</span>
+                    {formatStake(gameState.totalStaked)} <span className="text-primary">VERSUS</span>
                   </span>
                 </div>
               </div>
@@ -737,7 +737,7 @@ export function GameStaking() {
                   disabled={!isConnected || gameState.isStaking}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-sm text-primary/80">pSAGA</span>
+                  <span className="text-sm text-primary/80">VERSUS</span>
                 </div>
               </div>
             </div>

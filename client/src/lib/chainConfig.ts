@@ -1,12 +1,12 @@
-// Configuration for the pSAGA Chainlet network
+// Configuration for the VERSUS Chainlet network
 export const PSAGA_CHAINLET_CONFIG = {
   chainId: 'oracle_2743084370893000-1',
-  chainName: 'pSAGA Chainlet',
+  chainName: 'VERSUS Chainlet',
   rpcEndpoint: 'https://oracle-2743084370893000-1.jsonrpc.sagarpc.io',
   restEndpoint: 'https://oracle-2743084370893000-1.jsonrpc.sagarpc.io',
   stakeCurrency: {
-    coinDenom: 'pSAGA',
-    coinMinimalDenom: 'upsaga',
+    coinDenom: 'VERSUS',
+    coinMinimalDenom: 'uversus',
     coinDecimals: 6,
   },
   bip44: {
@@ -22,15 +22,15 @@ export const PSAGA_CHAINLET_CONFIG = {
   },
   currencies: [
     {
-      coinDenom: 'pSAGA',
-      coinMinimalDenom: 'upsaga',
+      coinDenom: 'VERSUS',
+      coinMinimalDenom: 'uversus',
       coinDecimals: 6,
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: 'pSAGA',
-      coinMinimalDenom: 'upsaga',
+      coinDenom: 'VERSUS',
+      coinMinimalDenom: 'uversus',
       coinDecimals: 6,
     },
   ],
@@ -48,7 +48,7 @@ export const getFormattedChainId = () => {
   try {
     // Since the chainId is not a standard hex format, we'll create a custom identifier
     // This is a simplified approach - in a production app you'd need proper chain ID handling
-    // based on specific requirements of the pSAGA network
+    // based on specific requirements of the VERSUS network
     return `0x${Number(42).toString(16)}`;
   } catch (error) {
     console.error("Error formatting chain ID:", error);

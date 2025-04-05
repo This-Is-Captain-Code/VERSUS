@@ -67,7 +67,7 @@ export function MetaMaskConnection() {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-primary/40 to-purple-700/40 p-6 border-b border-primary/30">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold neon-text">pSAGA <span className="gradient-text font-bold">CHAINLET</span></h1>
+          <h1 className="text-xl font-semibold neon-text">VERSUS <span className="gradient-text font-bold">CHAINLET</span></h1>
           <div className="flex items-center text-sm bg-black/30 px-3 py-1 rounded-full">
             <span className={`h-2.5 w-2.5 rounded-full mr-2 ${
               isConnected ? 'bg-primary animate-pulse' : error ? 'bg-red-500' : 'bg-neutral-500'

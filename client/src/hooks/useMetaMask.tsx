@@ -91,7 +91,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     setIsLoadingBalances(true);
     
     try {
-      // Fetch native token balance (pSAGA)
+      // Fetch native token balance (VERSUS)
       const balance = await ethProvider.getBalance(address);
       
       // Format the balance with the correct number of decimals from the chain config
@@ -164,7 +164,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [provider]);
 
-  // Add pSAGA chainlet to MetaMask
+  // Add VERSUS chainlet to MetaMask
   const addChainToMetaMask = useCallback(async () => {
     if (!window.ethereum) {
       setError('MetaMask is not installed');
@@ -197,7 +197,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (err: any) {
       console.error('Error adding chain to MetaMask:', err);
-      setError(err.message || 'Failed to add pSAGA Chainlet to MetaMask');
+      setError(err.message || 'Failed to add VERSUS Chainlet to MetaMask');
       return false;
     }
   }, []);
@@ -224,7 +224,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
       
       setAccount(accounts[0]);
       
-      // Try to switch to pSAGA chain
+      // Try to switch to VERSUS chain
       const formattedChainId = getFormattedChainId();
       if (!formattedChainId) {
         throw new Error('Invalid chain configuration');
@@ -240,7 +240,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
         if (switchError.code === 4902) {
           const added = await addChainToMetaMask();
           if (!added) {
-            throw new Error('Failed to add pSAGA Chainlet to MetaMask');
+            throw new Error('Failed to add VERSUS Chainlet to MetaMask');
           }
         } else {
           throw switchError;
