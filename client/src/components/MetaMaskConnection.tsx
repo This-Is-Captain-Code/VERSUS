@@ -3,7 +3,7 @@ import { useMetaMask } from '@/hooks/useMetaMask';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { PSAGA_CHAINLET_CONFIG } from '@/lib/chainConfig';
+import { VERSUS_CHAINLET_CONFIG } from '@/lib/chainConfig';
 import { 
   AlertCircle, 
   Check, 
@@ -67,7 +67,7 @@ export function MetaMaskConnection() {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-primary/40 to-purple-700/40 p-6 border-b border-primary/30">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold neon-text">pSAGA <span className="gradient-text font-bold">CHAINLET</span></h1>
+          <h1 className="text-xl font-semibold neon-text">VERSUS <span className="gradient-text font-bold">CHAINLET</span></h1>
           <div className="flex items-center text-sm bg-black/30 px-3 py-1 rounded-full">
             <span className={`h-2.5 w-2.5 rounded-full mr-2 ${
               isConnected ? 'bg-primary animate-pulse' : error ? 'bg-red-500' : 'bg-neutral-500'
@@ -190,22 +190,22 @@ export function MetaMaskConnection() {
             <ul className="space-y-3 text-sm">
               <li className="flex justify-between">
                 <span className="text-primary/70">Chain ID:</span>
-                <span className="font-medium text-white">{PSAGA_CHAINLET_CONFIG.chainId}</span>
+                <span className="font-medium text-white">{VERSUS_CHAINLET_CONFIG.chainId}</span>
               </li>
               <li className="flex justify-between">
                 <span className="text-primary/70">Chain Name:</span>
-                <span className="font-medium text-white">{PSAGA_CHAINLET_CONFIG.chainName}</span>
+                <span className="font-medium text-white">{VERSUS_CHAINLET_CONFIG.chainName}</span>
               </li>
               <li className="flex justify-between">
                 <span className="text-primary/70">Native Token:</span>
                 <span className="font-medium text-white">
-                  {PSAGA_CHAINLET_CONFIG.stakeCurrency.coinDenom} 
-                  <span className="text-primary/80">({PSAGA_CHAINLET_CONFIG.stakeCurrency.coinMinimalDenom})</span>
+                  {VERSUS_CHAINLET_CONFIG.stakeCurrency.coinDenom} 
+                  <span className="text-primary/80">({VERSUS_CHAINLET_CONFIG.stakeCurrency.coinMinimalDenom})</span>
                 </span>
               </li>
               <li className="flex justify-between">
                 <span className="text-primary/70">Decimals:</span>
-                <span className="font-medium text-white">{PSAGA_CHAINLET_CONFIG.stakeCurrency.coinDecimals}</span>
+                <span className="font-medium text-white">{VERSUS_CHAINLET_CONFIG.stakeCurrency.coinDecimals}</span>
               </li>
             </ul>
             
@@ -214,7 +214,7 @@ export function MetaMaskConnection() {
             {/* Explorer Link */}
             <div className="text-center">
               <a 
-                href={PSAGA_CHAINLET_CONFIG.explorerUrl}
+                href={VERSUS_CHAINLET_CONFIG.explorerUrl}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-xs inline-flex items-center text-primary hover:text-primary-light transition-colors neon-text"
