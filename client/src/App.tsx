@@ -19,8 +19,11 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <div className="cyber-grid min-h-screen flex flex-col items-center py-8 px-4">
+        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-black to-background/90 opacity-80" />
+        <Router />
+        <Toaster />
+      </div>
     </QueryClientProvider>
   );
 }

@@ -408,39 +408,39 @@ export function GameStaking() {
   };
   
   return (
-    <Card className="w-full max-w-md shadow-lg border-primary/20">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-        <CardTitle className="flex items-center gap-2 text-xl">
+    <Card className="cyberpunk-card w-full max-w-md shadow-lg backdrop-blur-sm">
+      <CardHeader className="bg-black/40 border-b border-primary/30">
+        <CardTitle className="flex items-center gap-2 text-xl neon-text">
           <GamepadIcon className="h-5 w-5" />
-          Game Staking Portal
+          <span className="gradient-text font-bold">GAME STAKING PORTAL</span>
         </CardTitle>
-        <CardDescription>
-          Stake your pSAGA tokens to enter the game
+        <CardDescription className="text-primary/80">
+          Stake your pSAGA tokens to enter the cybernetic realm
         </CardDescription>
       </CardHeader>
       
       <CardContent className="p-6 space-y-6">
         {/* Current Stakes Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-neutral-700">Current Stakes</h3>
+          <h3 className="text-sm font-medium text-primary/90">CURRENT STAKES</h3>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-primary/5 rounded-lg p-3">
-              <div className="text-xs text-neutral-500 mb-1">Your Stake</div>
+            <div className="bg-black/60 rounded-lg p-3 neon-border">
+              <div className="text-xs text-primary/70 mb-1">Your Stake</div>
               <div className="flex items-center">
                 <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
-                <span className="font-bold">
-                  {formatStake(gameState.userStake)} pSAGA
+                <span className="font-bold text-white">
+                  {formatStake(gameState.userStake)} <span className="text-primary">pSAGA</span>
                 </span>
               </div>
             </div>
             
-            <div className="bg-primary/5 rounded-lg p-3">
-              <div className="text-xs text-neutral-500 mb-1">Total Staked</div>
+            <div className="bg-black/60 rounded-lg p-3 neon-border">
+              <div className="text-xs text-primary/70 mb-1">Total Staked</div>
               <div className="flex items-center">
                 <CoinsIcon className="h-3.5 w-3.5 text-primary mr-1.5" />
-                <span className="font-bold">
-                  {formatStake(gameState.totalStaked)} pSAGA
+                <span className="font-bold text-white">
+                  {formatStake(gameState.totalStaked)} <span className="text-primary">pSAGA</span>
                 </span>
               </div>
             </div>
@@ -451,7 +451,7 @@ export function GameStaking() {
             <Button
               variant="outline"
               size="sm"
-              className="mt-2 border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 w-full"
+              className="mt-2 border-red-500/70 text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full"
               onClick={handleResetStake}
               disabled={!isConnected || isResettingStake}
             >
@@ -471,22 +471,22 @@ export function GameStaking() {
           
           {/* Current Winner Display */}
           {gameState.currentWinner && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
-              <div className="text-xs text-yellow-700 mb-1">Current Winner</div>
-              <div className="text-sm font-mono truncate">
+            <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3 mt-2">
+              <div className="text-xs text-yellow-400 mb-1">Current Winner</div>
+              <div className="text-sm font-mono truncate text-yellow-300">
                 {gameState.currentWinner === account ? 'You are the Winner! 🏆' : gameState.currentWinner}
               </div>
             </div>
           )}
         </div>
         
-        <Separator />
+        <Separator className="bg-primary/20" />
         
         {/* Set Winner Button */}
         <div className="space-y-2">
           <Button
             variant="outline"
-            className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+            className="w-full border-amber-500/50 text-amber-300 hover:bg-amber-800/20 hover:text-amber-200 neon-border"
             onClick={handleSetWinner}
             disabled={!isConnected || isSettingWinner}
           >
@@ -499,7 +499,7 @@ export function GameStaking() {
               'Set Me as Winner'
             )}
           </Button>
-          <p className="text-xs text-neutral-500 text-center">
+          <p className="text-xs text-primary/70 text-center">
             (For testing only: Sets your address as the game winner)
           </p>
         </div>
@@ -509,7 +509,7 @@ export function GameStaking() {
           <div className="space-y-2 mt-4">
             <Button
               variant="outline"
-              className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+              className="w-full border-emerald-500/50 text-emerald-300 hover:bg-emerald-800/20 hover:text-emerald-200 neon-border"
               onClick={handleStartNewSession}
               disabled={!isConnected || isStartingNewSession}
             >
@@ -522,20 +522,20 @@ export function GameStaking() {
                 'Start New Staking Session'
               )}
             </Button>
-            <p className="text-xs text-neutral-500 text-center">
+            <p className="text-xs text-primary/70 text-center">
               Resets the game to start a new staking round
             </p>
           </div>
         )}
         
-        <Separator />
+        <Separator className="bg-primary/20" />
         
         {/* Stake Form */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-neutral-700">Stake pSAGA Tokens</h3>
+          <h3 className="text-sm font-medium text-primary/90">STAKE TOKENS</h3>
           
           <div className="grid gap-2">
-            <Label htmlFor="stake-amount">Stake Amount</Label>
+            <Label htmlFor="stake-amount" className="text-primary/80">Stake Amount</Label>
             <div className="relative">
               <Input
                 id="stake-amount"
@@ -543,17 +543,17 @@ export function GameStaking() {
                 value={stakeAmount}
                 onChange={handleStakeAmountChange}
                 placeholder="0.0"
-                className="pr-12"
+                className="pr-12 bg-black/50 border-primary/50 text-white focus:border-primary focus:ring-primary/30"
                 disabled={!isConnected || gameState.isStaking}
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <span className="text-sm text-neutral-500">pSAGA</span>
+                <span className="text-sm text-primary/80">pSAGA</span>
               </div>
             </div>
           </div>
           
           <Button 
-            className="w-full" 
+            className="w-full bg-primary/80 hover:bg-primary neon-glow text-black font-bold" 
             onClick={handleStake}
             disabled={!isConnected || gameState.isStaking || parseFloat(stakeAmount) <= 0}
           >
@@ -569,9 +569,9 @@ export function GameStaking() {
         </div>
       </CardContent>
       
-      <CardFooter className="bg-primary p-6 flex flex-col">
+      <CardFooter className="bg-gradient-to-r from-primary/20 to-purple-700/20 p-6 flex flex-col border-t border-primary/30">
         <Button
-          className="w-full bg-white text-primary hover:bg-white/90 hover:text-primary font-bold py-6 text-lg"
+          className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-black font-bold py-6 text-lg uppercase tracking-wider neon-glow"
           onClick={handleEnterGame}
           disabled={!isConnected || ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) || isEntering}
         >
@@ -585,10 +585,10 @@ export function GameStaking() {
           )}
         </Button>
         
-        <p className="text-white/80 text-xs mt-2 text-center">
+        <p className="text-primary/80 text-xs mt-2 text-center">
           {ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) 
             ? 'Stake tokens to unlock game entry' 
-            : 'Click to enter the game with your current stake'}
+            : 'Click to enter the virtual realm with your current stake'}
         </p>
       </CardFooter>
     </Card>
