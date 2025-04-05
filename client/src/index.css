@@ -35,6 +35,21 @@
   .cyberpunk-card {
     @apply bg-black/60 backdrop-blur-sm border border-primary/30;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+  }
+  
+  /* Chat-like moving outline for cyberpunk card */
+  .cyberpunk-card::after {
+    content: "";
+    position: absolute;
+    z-index: 5;
+    top: -1px;
+    left: -1px;
+    width: 7%;
+    height: 2px;
+    background-color: theme('colors.primary.DEFAULT');
+    box-shadow: 0 0 8px theme('colors.primary.DEFAULT');
+    animation: borderTravel 3s linear infinite;
   }
   
   .cyber-grid {
