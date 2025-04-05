@@ -113,37 +113,23 @@ export function GameStaking() {
   
   // Fetch data on component mount and when connection status changes
   useEffect(() => {
-    // Check if there was a previous reset from localStorage
+    // Clear any localStorage values since we want to always use contract values
     try {
-      const wasReset = localStorage.getItem('gameStakeReset') === 'true';
-      const resetTimestamp = localStorage.getItem('gameStakeResetTimestamp');
-      
-      // If reset was done in the last hour, ensure user stake stays at 0
-      if (wasReset && resetTimestamp) {
-        const resetTime = parseInt(resetTimestamp);
-        const hourAgo = Date.now() - (60 * 60 * 1000);
-        
-        if (resetTime > hourAgo) {
-          // Force user stake to 0 on initial render
-          setGameState(prev => ({
-            ...prev,
-            userStake: '0'
-          }));
-        }
-      }
+      localStorage.removeItem('gameStakeReset');
+      localStorage.removeItem('gameStakeResetTimestamp');
     } catch (err) {
-      console.error('Error checking local storage for stake reset:', err);
+      console.error('Error clearing local storage stake reset:', err);
     }
     
-    // Fetch contract data with a slight delay to ensure our reset takes precedence
-    setTimeout(() => {
+    // Fetch contract data immediately on connection
+    if (isConnected) {
       fetchContractData();
-    }, 100);
+    }
     
     // Set up a refresh interval when connected
     let intervalId: NodeJS.Timeout;
     if (isConnected) {
-      intervalId = setInterval(fetchContractData, 15000); // Refresh every 15 seconds
+      intervalId = setInterval(fetchContractData, 10000); // Refresh every 10 seconds
     }
     
     return () => {
@@ -224,13 +210,7 @@ export function GameStaking() {
         description: `Successfully staked ${stakeAmount} pSAGA`,
       });
       
-      // Clear any previous reset state since we're staking again
-      try {
-        localStorage.removeItem('gameStakeReset');
-        localStorage.removeItem('gameStakeResetTimestamp');
-      } catch (error) {
-        console.error('Error clearing stake reset state:', error);
-      }
+      // No longer using localStorage for stake data
       
       // Refresh data
       await fetchContractData();
@@ -337,13 +317,7 @@ export function GameStaking() {
         currentWinner: account
       }));
       
-      // Store reset state in localStorage to persist across refreshes
-      try {
-        localStorage.setItem('gameStakeReset', 'true');
-        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
-      } catch (error) {
-        console.error('Error storing reset state:', error);
-      }
+      // No longer using localStorage for stake reset
       
       toast({
         title: "Winner Set",
@@ -462,13 +436,7 @@ export function GameStaking() {
         description: "Successfully withdrawn your staked tokens",
       });
       
-      // Clear any previous reset state
-      try {
-        localStorage.removeItem('gameStakeReset');
-        localStorage.removeItem('gameStakeResetTimestamp');
-      } catch (error) {
-        console.error('Error clearing stake reset state:', error);
-      }
+      // No longer using localStorage for stake reset state
       
     } catch (error: any) {
       console.error('Unstake error:', error);
@@ -559,14 +527,7 @@ export function GameStaking() {
         description: "Ready for new staking round!",
       });
       
-      // Store the reset state in local storage to remember that we've reset
-      // This helps ensure the UI remains consistent across sessions
-      try {
-        localStorage.setItem('gameStakeReset', 'true');
-        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
-      } catch (error) {
-        console.error('Error storing reset state:', error);
-      }
+      // No longer using localStorage for tracking reset state
       
       // Refresh contract data to ensure everything is in sync, but force userStake to 0
       const refreshData = async () => {
