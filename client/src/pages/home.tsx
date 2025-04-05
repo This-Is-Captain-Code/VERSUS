@@ -10,12 +10,12 @@ export default function Home() {
           <header className="mb-12 text-center py-8">
             <div className="mb-2 relative">
               <h1 className="text-6xl font-black uppercase gradient-text tracking-tighter">
-                VERSUS
+                pSAGA
               </h1>
               <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-40 h-12 bg-primary/10 blur-2xl rounded-full"></div>
             </div>
             <h2 className="text-3xl font-bold text-white mb-4 neon-text tracking-wide">
-              VIRTUAL GAMING PORTAL
+              CHAINLET GAMING PORTAL
             </h2>
             <p className="text-primary/80 max-w-lg mx-auto border-t border-b border-primary/20 py-3 text-sm">
               CONNECT YOUR METAMASK WALLET • STAKE YOUR TOKENS • ENTER THE GAME
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
           
           <footer className="mt-16 text-center text-primary/40 text-sm border-t border-primary/10 pt-6 pb-12">
-            <p>© 2025 VERSUS-GAMING-INTERFACE // ALL RIGHTS RESERVED</p>
+            <p>© 2025 PSAGA-CHAINLET-GAME.INTERFACE // ALL RIGHTS RESERVED</p>
           </footer>
         </div>
       </MetaMaskProvider>

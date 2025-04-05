@@ -596,10 +596,10 @@ export function GameStaking() {
         <CardHeader className="bg-black/40 border-b border-primary/30">
           <CardTitle className="flex items-center gap-2 text-xl neon-text">
             <GamepadIcon className="h-5 w-5" />
-            <span className="gradient-text font-bold">VERSUS STAKING PORTAL</span>
+            <span className="gradient-text font-bold">GAME STAKING PORTAL</span>
           </CardTitle>
           <CardDescription className="text-primary/80">
-            Stake your pSAGA tokens to enter the VERSUS cybernetic realm
+            Stake your pSAGA tokens to enter the cybernetic realm
           </CardDescription>
         </CardHeader>
         
