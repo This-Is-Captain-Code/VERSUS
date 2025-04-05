@@ -9,13 +9,6 @@ export const GAME_CONTRACT_ABI = [
   },
   {
     "inputs": [],
-    "name": "distributeRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -44,26 +37,6 @@ export const GAME_CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_winner",
-        "type": "address"
-      }
-    ],
-    "name": "setWinner",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stake",
-    "outputs": [],
-    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -100,13 +73,6 @@ export const GAME_CONTRACT_ABI = [
   },
   {
     "inputs": [],
-    "name": "unstake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "winner",
     "outputs": [
       {
@@ -116,6 +82,33 @@ export const GAME_CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stake", 
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_winner",
+        "type": "address"
+      }
+    ],
+    "name": "setWinner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ];

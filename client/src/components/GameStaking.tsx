@@ -373,21 +373,44 @@ export function GameStaking() {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
+      
+      // Log contract address and ABI for debugging
+      console.log('Contract address:', GAME_CONTRACT_ADDRESS);
+      console.log('Using ABI with these functions:', 
+        GAME_CONTRACT_ABI
+          .filter((item: any) => item.type === 'function')
+          .map((item: any) => item.name)
+      );
+      
       const contract = new ethers.Contract(
         GAME_CONTRACT_ADDRESS,
         GAME_CONTRACT_ABI,
         signer
       );
       
-      // Call the unstake function from the contract
-      const tx = await contract.unstake();
+      // Check if the unstake function exists
+      if (typeof contract.unstake !== 'function') {
+        throw new Error('Unstake function not found in contract');
+      }
+      
+      // Add logging for debugging
+      console.log('Calling unstake function...');
+      
+      // Call the unstake function from the contract with explicit gas limit
+      const tx = await contract.unstake({
+        gasLimit: 200000 // Provide enough gas for the transaction
+      });
       
       toast({
         title: "Transaction Submitted",
         description: "Your unstake transaction is being processed",
       });
       
-      await tx.wait();
+      console.log('Transaction hash:', tx.hash);
+      
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
+      console.log('Transaction receipt:', receipt);
       
       // After unstaking, refresh the stake values from the contract
       await fetchContractData();
@@ -407,9 +430,30 @@ export function GameStaking() {
       
     } catch (error: any) {
       console.error('Unstake error:', error);
+      
+      // Enhanced error handling
+      let errorMessage = "There was an error withdrawing your tokens";
+      
+      if (error.code) {
+        console.log('Error code:', error.code);
+      }
+      
+      if (error.reason) {
+        errorMessage = `Error: ${error.reason}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+        
+        // Check for common error patterns
+        if (error.message.includes("user rejected")) {
+          errorMessage = "Transaction was rejected by user";
+        } else if (error.message.includes("insufficient funds")) {
+          errorMessage = "Insufficient funds for gas * price + value";
+        }
+      }
+      
       toast({
         title: "Unstake Failed",
-        description: error.message || "There was an error withdrawing your tokens",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
