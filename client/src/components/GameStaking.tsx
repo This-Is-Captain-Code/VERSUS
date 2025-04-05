@@ -208,12 +208,16 @@ export function GameStaking() {
     
     setIsEntering(true);
     
-    // Simulate entering the game (normally this would redirect to a game or start a game session)
+    // Show entering toast
+    toast({
+      title: "Entering Game World",
+      description: "Redirecting to Horizon Meta...",
+    });
+    
+    // Redirect to Horizon Meta after a brief delay
     setTimeout(() => {
-      toast({
-        title: "Game Entry Successful",
-        description: "You've entered the game!",
-      });
+      // Open in a new tab
+      window.open('https://horizon.meta.com/worlds/631234523404686/?snapshot_id=1594378804596639', '_blank');
       setIsEntering(false);
     }, 1500);
   };
