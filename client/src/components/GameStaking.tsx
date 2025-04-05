@@ -36,6 +36,7 @@ export function GameStaking() {
     error: null,
   });
   const [isEntering, setIsEntering] = useState(false);
+  const [isSettingWinner, setIsSettingWinner] = useState(false);
 
   // Fetch contract data
   const fetchContractData = useCallback(async () => {
@@ -222,6 +223,58 @@ export function GameStaking() {
     }, 1500);
   };
   
+  // Handle setting the current user as the winner
+  const handleSetWinner = async () => {
+    if (!isConnected || !account || !window.ethereum) {
+      toast({
+        title: "Not Connected",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSettingWinner(true);
+    
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        GAME_CONTRACT_ADDRESS,
+        GAME_CONTRACT_ABI,
+        signer
+      );
+      
+      // Call the setWinner function with the current account
+      const tx = await contract.setWinner(account);
+      
+      toast({
+        title: "Transaction Submitted",
+        description: "Setting winner transaction is being processed",
+      });
+      
+      await tx.wait();
+      
+      toast({
+        title: "Winner Set",
+        description: "You have been set as the winner!",
+      });
+      
+      // Refresh contract data
+      await fetchContractData();
+      
+    } catch (error: any) {
+      console.error('Set winner error:', error);
+      toast({
+        title: "Set Winner Failed",
+        description: error.message || "There was an error setting the winner",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSettingWinner(false);
+    }
+  };
+  
   // Format stake amount for display
   const formatStake = (amount: string) => {
     return formatEthers(amount, PSAGA_CHAINLET_CONFIG.stakeCurrency.coinDecimals);
@@ -265,6 +318,40 @@ export function GameStaking() {
               </div>
             </div>
           </div>
+          
+          {/* Current Winner Display */}
+          {gameState.currentWinner && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
+              <div className="text-xs text-yellow-700 mb-1">Current Winner</div>
+              <div className="text-sm font-mono truncate">
+                {gameState.currentWinner === account ? 'You are the Winner! 🏆' : gameState.currentWinner}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <Separator />
+        
+        {/* Set Winner Button */}
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+            onClick={handleSetWinner}
+            disabled={!isConnected || isSettingWinner}
+          >
+            {isSettingWinner ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Setting Winner...
+              </>
+            ) : (
+              'Set Me as Winner'
+            )}
+          </Button>
+          <p className="text-xs text-neutral-500 text-center">
+            (For testing only: Sets your address as the game winner)
+          </p>
         </div>
         
         <Separator />
