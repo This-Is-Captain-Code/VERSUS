@@ -298,30 +298,39 @@ export function GameStaking() {
         signer
       );
       
-      // Call the resetGame function if it exists
-      // If not, we'll set winner to zero address to reset the game
-      let tx;
-      if ('resetGame' in contract) {
-        tx = await contract.resetGame();
-      } else {
-        // Fallback: set winner to zero address
-        tx = await contract.setWinner(ethers.ZeroAddress);
-      }
+      // Set winner to zero address to reset the game
+      const tx = await contract.setWinner(ethers.ZeroAddress);
       
       toast({
-        title: "Transaction Submitted",
-        description: "New session transaction is being processed",
+        title: "Resetting Game",
+        description: "Resetting winner to start a new session...",
       });
       
       await tx.wait();
+      
+      // For this specific contract, we need to manually update our state
+      // Since the contract doesn't have a way to reset stakes directly
+      setGameState(prev => ({
+        ...prev,
+        userStake: '0',
+        totalStaked: '0',
+        currentWinner: null
+      }));
       
       toast({
         title: "New Session Started",
         description: "Ready for new staking round!",
       });
       
-      // Refresh contract data
+      // Refresh contract data to confirm changes
       await fetchContractData();
+      
+      // Additional notification about the stakes
+      toast({
+        title: "Note on Stakes",
+        description: "Your stake has been reset in the UI. You can add new stakes now.",
+        duration: 5000,
+      });
       
     } catch (error: any) {
       console.error('Start new session error:', error);
