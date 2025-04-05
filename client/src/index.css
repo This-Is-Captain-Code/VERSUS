@@ -32,24 +32,67 @@
                 0 0 20px theme('colors.primary.DEFAULT');
   }
   
-  .cyberpunk-card {
-    @apply bg-black/60 backdrop-blur-sm border border-primary/30;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  /* Button border tracing effect */
+  .cyberpunk-border {
     position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
   }
   
-  /* Chat-like moving outline for cyberpunk card */
-  .cyberpunk-card::after {
-    content: "";
+  .cyberpunk-border::before {
+    content: '';
     position: absolute;
-    z-index: 5;
-    top: -1px;
-    left: -1px;
-    width: 7%;
-    height: 2px;
-    background-color: theme('colors.primary.DEFAULT');
-    box-shadow: 0 0 8px theme('colors.primary.DEFAULT');
-    animation: borderTravel 3s linear infinite;
+    inset: 0;
+    padding: 2px;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(255, 255, 255, 0.9) 0deg,
+      rgba(127, 58, 236, 0.9) 90deg, 
+      rgba(13, 242, 201, 0.6) 180deg,
+      rgba(127, 58, 236, 0.6) 270deg,
+      rgba(255, 255, 255, 0.9) 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: rotateBorder 2.5s linear infinite;
+    opacity: 1;
+    z-index: 1;
+  }
+  
+  .cyberpunk-border:hover::before {
+    animation-duration: 1.5s;
+    opacity: 1;
+  }
+  
+  .cyberpunk-card {
+    @apply bg-black/60 backdrop-blur-sm;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Chat-like outline tracing effect for cyberpunk card */
+  .cyberpunk-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 4px;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      theme('colors.primary.DEFAULT') 0deg,
+      rgba(127, 58, 236, 1) 90deg, 
+      rgba(13, 242, 201, 0.3) 180deg,
+      rgba(127, 58, 236, 0.3) 270deg,
+      theme('colors.primary.DEFAULT') 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: rotateBorder 4s linear infinite;
   }
   
   .cyber-grid {
@@ -114,35 +157,24 @@
   }
 
   .game-loading-container::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
+    padding: 2px;
     border-radius: 8px;
-    padding: 2px; 
-    background: linear-gradient(
-      90deg,
-      theme('colors.primary.DEFAULT'),
-      #7f3aec
-    ); 
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
-      linear-gradient(#fff 0 0);
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      theme('colors.primary.DEFAULT') 0deg,
+      rgba(127, 58, 236, 1) 90deg, 
+      rgba(13, 242, 201, 0.3) 180deg,
+      rgba(127, 58, 236, 0.3) 270deg,
+      theme('colors.primary.DEFAULT') 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
-    mask-composite: exclude; 
-  }
-
-  /* Animated line that runs along the border */
-  .game-loading-container::after {
-    content: "";
-    position: absolute;
-    z-index: 5;
-    top: -1px;
-    left: -1px;
-    width: 15%;
-    height: 2px;
-    background-color: theme('colors.primary.DEFAULT');
-    box-shadow: 0 0 8px theme('colors.primary.DEFAULT');
-    animation: borderTravel 3s linear infinite;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: rotateBorder 4s linear infinite;
   }
 
   @keyframes borderTravel {
@@ -339,6 +371,11 @@
   @keyframes borderAnimation {
     0% { background-position: 0% 0; }
     100% { background-position: 300% 0; }
+  }
+  
+  @keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
   
   @keyframes blockOutline {
