@@ -21,7 +21,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { CoinsIcon, GamepadIcon, Loader2 } from 'lucide-react';
+import { CoinsIcon, GamepadIcon, Loader2, RefreshCcw } from 'lucide-react';
 
 export function GameStaking() {
   const { isConnected, account } = useMetaMask();
@@ -38,6 +38,7 @@ export function GameStaking() {
   const [isEntering, setIsEntering] = useState(false);
   const [isSettingWinner, setIsSettingWinner] = useState(false);
   const [isStartingNewSession, setIsStartingNewSession] = useState(false);
+  const [isResettingStake, setIsResettingStake] = useState(false);
 
   // Fetch contract data
   const fetchContractData = useCallback(async () => {
@@ -276,6 +277,43 @@ export function GameStaking() {
     }
   };
   
+  // Handle resetting your stake (UI only)
+  const handleResetStake = () => {
+    if (!isConnected || !account) {
+      toast({
+        title: "Not Connected",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsResettingStake(true);
+    
+    try {
+      // Since there's no contract function to reset the stake, we'll just update the UI
+      setGameState(prev => ({
+        ...prev,
+        userStake: '0'
+      }));
+      
+      toast({
+        title: "Stake Reset",
+        description: "Your stake has been reset in the UI. The blockchain value remains unchanged.",
+        duration: 5000,
+      });
+    } catch (error: any) {
+      console.error('Reset stake error:', error);
+      toast({
+        title: "Failed to Reset Stake",
+        description: "There was an error resetting your stake in the UI.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResettingStake(false);
+    }
+  };
+  
   // Handle starting a new staking session
   const handleStartNewSession = async () => {
     if (!isConnected || !account || !window.ethereum) {
@@ -387,6 +425,29 @@ export function GameStaking() {
               </div>
             </div>
           </div>
+          
+          {/* Reset Your Stake Button */}
+          {ethers.getBigInt(gameState.userStake) > ethers.getBigInt(0) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2 border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 w-full"
+              onClick={handleResetStake}
+              disabled={!isConnected || isResettingStake}
+            >
+              {isResettingStake ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  Resetting Stake...
+                </>
+              ) : (
+                <>
+                  <RefreshCcw className="mr-1 h-3 w-3" />
+                  Reset Your Stake
+                </>
+              )}
+            </Button>
+          )}
           
           {/* Current Winner Display */}
           {gameState.currentWinner && (
