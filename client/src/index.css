@@ -32,67 +32,9 @@
                 0 0 20px theme('colors.primary.DEFAULT');
   }
   
-  /* Button border tracing effect */
-  .cyberpunk-border {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-  
-  .cyberpunk-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    background: conic-gradient(
-      from 0deg at 50% 50%,
-      rgba(255, 255, 255, 0.9) 0deg,
-      rgba(127, 58, 236, 0.9) 90deg, 
-      rgba(13, 242, 201, 0.6) 180deg,
-      rgba(127, 58, 236, 0.6) 270deg,
-      rgba(255, 255, 255, 0.9) 360deg
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    animation: rotateBorder 2.5s linear infinite;
-    opacity: 1;
-    z-index: 1;
-  }
-  
-  .cyberpunk-border:hover::before {
-    animation-duration: 1.5s;
-    opacity: 1;
-  }
-  
   .cyberpunk-card {
-    @apply bg-black/60 backdrop-blur-sm;
+    @apply bg-black/60 backdrop-blur-sm border border-primary/30;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  /* Chat-like outline tracing effect for cyberpunk card */
-  .cyberpunk-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    border-radius: 4px;
-    background: conic-gradient(
-      from 0deg at 50% 50%,
-      theme('colors.primary.DEFAULT') 0deg,
-      rgba(127, 58, 236, 1) 90deg, 
-      rgba(13, 242, 201, 0.3) 180deg,
-      rgba(127, 58, 236, 0.3) 270deg,
-      theme('colors.primary.DEFAULT') 360deg
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    animation: rotateBorder 4s linear infinite;
   }
   
   .cyber-grid {
@@ -143,76 +85,7 @@
   }
   
   .game-loading-container {
-    @apply relative flex flex-col items-center justify-center max-w-lg w-full px-8;
-    position: relative;
-  }
-  
-  /* Chat interface style moving outline effect - line that travels around the border */
-  .game-loading-container {
-    position: relative;
-    padding: 2rem;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-  }
-
-  .game-loading-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    border-radius: 8px;
-    background: conic-gradient(
-      from 0deg at 50% 50%,
-      theme('colors.primary.DEFAULT') 0deg,
-      rgba(127, 58, 236, 1) 90deg, 
-      rgba(13, 242, 201, 0.3) 180deg,
-      rgba(127, 58, 236, 0.3) 270deg,
-      theme('colors.primary.DEFAULT') 360deg
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    animation: rotateBorder 4s linear infinite;
-  }
-
-  @keyframes borderTravel {
-    0% {
-      top: -1px;
-      left: -1px;
-      width: 15%;
-      height: 2px;
-      transform: translateX(0);
-    }
-    25% {
-      top: -1px;
-      left: calc(100% - 15%);
-      width: 2px;
-      height: 15%;
-      transform: translateX(0);
-    }
-    50% {
-      top: calc(100% - 2px);
-      left: calc(100% - 2px);
-      width: 15%;
-      height: 2px;
-      transform: translateX(-100%);
-    }
-    75% {
-      top: calc(100% - 15%);
-      left: -1px;
-      width: 2px;
-      height: 15%;
-      transform: translateY(-100%);
-    }
-    100% {
-      top: -1px;
-      left: -1px;
-      width: 15%;
-      height: 2px;
-      transform: translateX(0);
-    }
+    @apply relative flex flex-col items-center justify-center max-w-lg w-full;
   }
   
   .game-loading-grid {
@@ -227,15 +100,11 @@
   .game-loading-title {
     @apply text-4xl font-bold mb-12 tracking-wider;
     animation: pulse 2s ease-in-out infinite;
-    position: relative;
-    z-index: 2;
   }
   
   .game-loading-bar-container {
     @apply w-full h-8 bg-black/80 border-2 border-primary/70 rounded-sm relative overflow-hidden;
     box-shadow: 0 0 15px rgba(13, 242, 201, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.8);
-    position: relative;
-    z-index: 2;
   }
   
   .game-loading-bar {
@@ -247,145 +116,44 @@
   .game-loading-message {
     @apply mt-4 text-white/80 text-center;
     animation: typeMessage 3s steps(40, end);
-    position: relative;
-    z-index: 2;
   }
   
   .game-loading-tip {
     @apply mt-8 p-4 border border-yellow-500/30 bg-yellow-900/20 text-yellow-300/90 text-sm max-w-md text-center;
     animation: fadeInDelay 1s ease-in-out 1s both;
-    position: relative;
-    z-index: 2;
-    
-    /* Animated corner effect */
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .game-loading-tip::before {
-    content: '';
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(90deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.8));
-    top: -15px;
-    left: -15px;
-    transform: rotate(45deg);
-    animation: cornerPulse 2s infinite;
   }
   
   .blocks-loading {
     @apply flex justify-center mt-6 mb-10;
-    position: relative;
-    z-index: 2;
   }
   
   .loading-block {
-    @apply w-6 h-6 mx-1 mb-8;
+    @apply w-6 h-6 mx-1 mb-8 bg-primary;
     animation: blockPulse 1.5s ease-in-out infinite;
-    position: relative;
-  }
-  
-  .loading-block::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    @apply bg-primary;
-    z-index: 1;
-  }
-  
-  .loading-block::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border: 1px solid;
-    @apply border-primary/50;
-    animation: blockOutline 1.5s ease-in-out infinite;
   }
   
   .loading-block:nth-child(1) {
     animation-delay: 0s;
   }
   
-  .loading-block:nth-child(1)::before {
-    @apply bg-primary;
-  }
-  
-  .loading-block:nth-child(1)::after {
-    @apply border-primary/50;
-    animation-delay: 0s;
-  }
-  
   .loading-block:nth-child(2) {
     animation-delay: 0.2s;
-  }
-  
-  .loading-block:nth-child(2)::before {
     @apply bg-blue-500;
-  }
-  
-  .loading-block:nth-child(2)::after {
-    @apply border-blue-500/50;
-    animation-delay: 0.2s;
   }
   
   .loading-block:nth-child(3) {
     animation-delay: 0.4s;
-  }
-  
-  .loading-block:nth-child(3)::before {
     @apply bg-purple-500;
-  }
-  
-  .loading-block:nth-child(3)::after {
-    @apply border-purple-500/50;
-    animation-delay: 0.4s;
   }
   
   .loading-block:nth-child(4) {
     animation-delay: 0.6s;
-  }
-  
-  .loading-block:nth-child(4)::before {
     @apply bg-pink-500;
-  }
-  
-  .loading-block:nth-child(4)::after {
-    @apply border-pink-500/50;
-    animation-delay: 0.6s;
   }
   
   .loading-block:nth-child(5) {
     animation-delay: 0.8s;
-  }
-  
-  .loading-block:nth-child(5)::before {
     @apply bg-yellow-500;
-  }
-  
-  .loading-block:nth-child(5)::after {
-    @apply border-yellow-500/50;
-    animation-delay: 0.8s;
-  }
-  
-  @keyframes borderAnimation {
-    0% { background-position: 0% 0; }
-    100% { background-position: 300% 0; }
-  }
-  
-  @keyframes rotateBorder {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  @keyframes blockOutline {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.3); }
-  }
-  
-  @keyframes cornerPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.8; }
   }
   
   @keyframes fadeIn {
