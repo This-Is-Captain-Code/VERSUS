@@ -1,0 +1,13 @@
+lockdown-install.js:1 Removing unpermitted intrinsics
+useMetaMask.tsx:110 Fetched balance: 9999999999999999.0 pSAGA
+GameStaking.tsx:378 Contract address: 0xDe69BC0b9e42a25a629bc13314da8Dcf87453Cd5
+GameStaking.tsx:379 Using ABI with these functions: Array(8)
+GameStaking.tsx:397 Calling unstake function...
+GameStaking.tsx:409 Transaction hash: 0x2bcc1ec3fcd7991e0065ff61565353c05ed8a82f2b2f9235312ffc429a1772cd
+hook.js:608 Unstake error: Error: transaction execution reverted (action="sendTransaction", data=null, reason=null, invocation=null, revert=null, transaction={ "data": "", "from": "0x2f97BB8e18B8c49C9112E0524F3Ac7cE0E7727b3", "to": "0xDe69BC0b9e42a25a629bc13314da8Dcf87453Cd5" }, receipt={ "_type": "TransactionReceipt", "blobGasPrice": null, "blobGasUsed": null, "blockHash": "0x7a6788b8a89a8bcc51c0425ba7b3ff86666c96b9f61e02e02a7934b6719ca74a", "blockNumber": 145398, "contractAddress": null, "cumulativeGasUsed": "100000", "from": "0x2f97BB8e18B8c49C9112E0524F3Ac7cE0E7727b3", "gasPrice": "7", "gasUsed": "100000", "hash": "0x2bcc1ec3fcd7991e0065ff61565353c05ed8a82f2b2f9235312ffc429a1772cd", "index": 0, "logs": [  ], "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "root": null, "status": 0, "to": "0xDe69BC0b9e42a25a629bc13314da8Dcf87453Cd5" }, code=CALL_EXCEPTION, version=6.13.5)
+    at makeError (ethers.js?v=78d3e7f4:325:15)
+    at assert (ethers.js?v=78d3e7f4:338:11)
+    at checkReceipt (ethers.js?v=78d3e7f4:14063:7)
+    at BrowserProvider.txListener (ethers.js?v=78d3e7f4:14113:21)
+overrideMethod @ hook.js:608
+GameStaking.tsx:438 Error code: CALL_EXCEPTION

@@ -62,26 +62,43 @@ export function GameStaking() {
       // Get total staked
       const totalStaked = await contract.totalStaked();
       
-      // Get user stake
+      // Get user stake directly from contract
       const userStake = await contract.stakes(account);
+      
+      console.log('Raw contract data:');
+      console.log('- Winner:', winner);
+      console.log('- Total staked:', totalStaked.toString());
+      console.log('- User stake:', userStake.toString());
       
       // Important: If there's a winner and total staked is 0, this means rewards were distributed
       // In this case, we should consider all stakes as 0 since they've been distributed
-      // This is because the contract doesn't reset individual stakes in the mapping
+      // This is because the contract doesn't reset individual stakes in the mapping but distributeRewards
+      // in the updated contract now resets stakes for all players
       const totalStakedBigInt = ethers.getBigInt(totalStaked.toString());
-      const effectiveUserStake = 
-        (winner !== ethers.ZeroAddress && totalStakedBigInt === ethers.getBigInt(0)) 
-          ? '0' 
-          : userStake.toString();
+      const userStakeBigInt = ethers.getBigInt(userStake.toString());
       
-      // If total staked is 0, all individual stakes should be considered reset
+      // In the updated contract, when unstake is called or funds are distributed,
+      // the individual stakes are properly reset to 0. So we just use the contract value.
+      const effectiveUserStake = userStake.toString();
+      
+      // If total staked is 0, the session has been reset
       // This ensures the UI is consistent with the contract's state after a winner is declared
       const isNewOrResetSession = totalStakedBigInt === ethers.getBigInt(0);
+      
+      // Clear any localStorage reset state if we detect a new session from the contract
+      if (isNewOrResetSession) {
+        try {
+          localStorage.removeItem('gameStakeReset');
+          localStorage.removeItem('gameStakeResetTimestamp');
+        } catch (error) {
+          console.error('Error clearing reset state:', error);
+        }
+      }
       
       // Update game state
       setGameState(prev => ({
         ...prev,
-        userStake: isNewOrResetSession ? '0' : effectiveUserStake,
+        userStake: effectiveUserStake,
         totalStaked: totalStaked.toString(),
         currentWinner: winner === ethers.ZeroAddress ? null : winner,
       }));
@@ -388,6 +405,31 @@ export function GameStaking() {
         signer
       );
       
+      // Verify actual stake amount on the contract
+      const contractStakeAmount = await contract.stakes(account);
+      console.log('Contract stake amount for address:', contractStakeAmount.toString());
+      console.log('UI stake amount:', gameState.userStake);
+      
+      // If contract stake is 0 but UI shows non-zero stake, there's a data inconsistency
+      if (ethers.getBigInt(contractStakeAmount.toString()) <= ethers.getBigInt(0)) {
+        console.warn('Contract shows zero stake but UI shows non-zero stake. Data inconsistency detected.');
+        
+        // Force UI to sync with contract
+        setGameState(prev => ({
+          ...prev,
+          userStake: '0'
+        }));
+        
+        toast({
+          title: "No Stake Found",
+          description: "The blockchain doesn't show any stake for your address. UI has been updated.",
+          variant: "destructive",
+        });
+        
+        setIsResettingStake(false);
+        return;
+      }
+      
       // Check if the unstake function exists
       if (typeof contract.unstake !== 'function') {
         throw new Error('Unstake function not found in contract');
@@ -398,7 +440,7 @@ export function GameStaking() {
       
       // Call the unstake function from the contract with explicit gas limit
       const tx = await contract.unstake({
-        gasLimit: 200000 // Provide enough gas for the transaction
+        gasLimit: 300000 // Increased gas limit to ensure enough gas
       });
       
       toast({
@@ -448,6 +490,10 @@ export function GameStaking() {
           errorMessage = "Transaction was rejected by user";
         } else if (error.message.includes("insufficient funds")) {
           errorMessage = "Insufficient funds for gas * price + value";
+        } else if (error.message.includes("execution reverted")) {
+          errorMessage = "Transaction reverted: You may not have any stake to withdraw";
+        } else if (error.message.includes("CALL_EXCEPTION")) {
+          errorMessage = "Contract call failed: Stake might have already been withdrawn";
         }
       }
       
@@ -456,6 +502,9 @@ export function GameStaking() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      // If we get a revert, force refresh the data from the contract
+      await fetchContractData();
     } finally {
       setIsResettingStake(false);
     }
