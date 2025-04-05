@@ -66,15 +66,20 @@ export function GameStaking() {
       // Important: If there's a winner and total staked is 0, this means rewards were distributed
       // In this case, we should consider all stakes as 0 since they've been distributed
       // This is because the contract doesn't reset individual stakes in the mapping
+      const totalStakedBigInt = ethers.getBigInt(totalStaked.toString());
       const effectiveUserStake = 
-        (winner !== ethers.ZeroAddress && ethers.getBigInt(totalStaked.toString()) === ethers.getBigInt(0)) 
+        (winner !== ethers.ZeroAddress && totalStakedBigInt === ethers.getBigInt(0)) 
           ? '0' 
           : userStake.toString();
+      
+      // If total staked is 0, all individual stakes should be considered reset
+      // This ensures the UI is consistent with the contract's state after a winner is declared
+      const isNewOrResetSession = totalStakedBigInt === ethers.getBigInt(0);
       
       // Update game state
       setGameState(prev => ({
         ...prev,
-        userStake: effectiveUserStake,
+        userStake: isNewOrResetSession ? '0' : effectiveUserStake,
         totalStaked: totalStaked.toString(),
         currentWinner: winner === ethers.ZeroAddress ? null : winner,
       }));
@@ -89,7 +94,32 @@ export function GameStaking() {
   
   // Fetch data on component mount and when connection status changes
   useEffect(() => {
-    fetchContractData();
+    // Check if there was a previous reset from localStorage
+    try {
+      const wasReset = localStorage.getItem('gameStakeReset') === 'true';
+      const resetTimestamp = localStorage.getItem('gameStakeResetTimestamp');
+      
+      // If reset was done in the last hour, ensure user stake stays at 0
+      if (wasReset && resetTimestamp) {
+        const resetTime = parseInt(resetTimestamp);
+        const hourAgo = Date.now() - (60 * 60 * 1000);
+        
+        if (resetTime > hourAgo) {
+          // Force user stake to 0 on initial render
+          setGameState(prev => ({
+            ...prev,
+            userStake: '0'
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Error checking local storage for stake reset:', err);
+    }
+    
+    // Fetch contract data with a slight delay to ensure our reset takes precedence
+    setTimeout(() => {
+      fetchContractData();
+    }, 100);
     
     // Set up a refresh interval when connected
     let intervalId: NodeJS.Timeout;
@@ -174,6 +204,14 @@ export function GameStaking() {
         title: "Stake Successful",
         description: `Successfully staked ${stakeAmount} pSAGA`,
       });
+      
+      // Clear any previous reset state since we're staking again
+      try {
+        localStorage.removeItem('gameStakeReset');
+        localStorage.removeItem('gameStakeResetTimestamp');
+      } catch (error) {
+        console.error('Error clearing stake reset state:', error);
+      }
       
       // Refresh data
       await fetchContractData();
@@ -274,6 +312,14 @@ export function GameStaking() {
         currentWinner: account
       }));
       
+      // Store reset state in localStorage to persist across refreshes
+      try {
+        localStorage.setItem('gameStakeReset', 'true');
+        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
+      } catch (error) {
+        console.error('Error storing reset state:', error);
+      }
+      
       toast({
         title: "Winner Set",
         description: "You have been set as the winner! All staked tokens have been distributed.",
@@ -313,6 +359,14 @@ export function GameStaking() {
         ...prev,
         userStake: '0'
       }));
+      
+      // Store reset state in localStorage to persist across page refreshes
+      try {
+        localStorage.setItem('gameStakeReset', 'true');
+        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
+      } catch (error) {
+        console.error('Error storing reset state:', error);
+      }
       
       toast({
         title: "Stake Reset",
@@ -380,8 +434,43 @@ export function GameStaking() {
         description: "Ready for new staking round!",
       });
       
-      // Refresh contract data to ensure everything is in sync
-      await fetchContractData();
+      // Store the reset state in local storage to remember that we've reset
+      // This helps ensure the UI remains consistent across sessions
+      try {
+        localStorage.setItem('gameStakeReset', 'true');
+        localStorage.setItem('gameStakeResetTimestamp', Date.now().toString());
+      } catch (error) {
+        console.error('Error storing reset state:', error);
+      }
+      
+      // Refresh contract data to ensure everything is in sync, but force userStake to 0
+      const refreshData = async () => {
+        if (!isConnected || !account || !window.ethereum) return;
+        
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contract = new ethers.Contract(
+            GAME_CONTRACT_ADDRESS,
+            GAME_CONTRACT_ABI,
+            provider
+          );
+          
+          const totalStaked = await contract.totalStaked();
+          const winner = await contract.winner();
+          
+          // Explicitly set userStake to 0 after new session
+          setGameState(prev => ({
+            ...prev,
+            userStake: '0',  // Force to 0 to ensure UI consistency
+            totalStaked: totalStaked.toString(),
+            currentWinner: winner === ethers.ZeroAddress ? null : winner,
+          }));
+        } catch (error) {
+          console.error('Error refreshing after session reset:', error);
+        }
+      };
+      
+      await refreshData();
       
       // Additional notification about the stakes
       toast({
