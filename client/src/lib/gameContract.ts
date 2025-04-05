@@ -124,6 +124,7 @@ export interface GameState {
   currentWinner: string | null;
   isStaking: boolean;
   error: string | null;
+  isStartingNewSession?: boolean;
 }
 
 // Format ethers to a human-readable format

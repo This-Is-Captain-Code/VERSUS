@@ -37,6 +37,7 @@ export function GameStaking() {
   });
   const [isEntering, setIsEntering] = useState(false);
   const [isSettingWinner, setIsSettingWinner] = useState(false);
+  const [isStartingNewSession, setIsStartingNewSession] = useState(false);
 
   // Fetch contract data
   const fetchContractData = useCallback(async () => {
@@ -275,6 +276,65 @@ export function GameStaking() {
     }
   };
   
+  // Handle starting a new staking session
+  const handleStartNewSession = async () => {
+    if (!isConnected || !account || !window.ethereum) {
+      toast({
+        title: "Not Connected",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsStartingNewSession(true);
+    
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        GAME_CONTRACT_ADDRESS,
+        GAME_CONTRACT_ABI,
+        signer
+      );
+      
+      // Call the resetGame function if it exists
+      // If not, we'll set winner to zero address to reset the game
+      let tx;
+      if ('resetGame' in contract) {
+        tx = await contract.resetGame();
+      } else {
+        // Fallback: set winner to zero address
+        tx = await contract.setWinner(ethers.ZeroAddress);
+      }
+      
+      toast({
+        title: "Transaction Submitted",
+        description: "New session transaction is being processed",
+      });
+      
+      await tx.wait();
+      
+      toast({
+        title: "New Session Started",
+        description: "Ready for new staking round!",
+      });
+      
+      // Refresh contract data
+      await fetchContractData();
+      
+    } catch (error: any) {
+      console.error('Start new session error:', error);
+      toast({
+        title: "Failed to Start New Session",
+        description: error.message || "There was an error starting a new session",
+        variant: "destructive",
+      });
+    } finally {
+      setIsStartingNewSession(false);
+    }
+  };
+  
   // Format stake amount for display
   const formatStake = (amount: string) => {
     return formatEthers(amount, PSAGA_CHAINLET_CONFIG.stakeCurrency.coinDecimals);
@@ -353,6 +413,30 @@ export function GameStaking() {
             (For testing only: Sets your address as the game winner)
           </p>
         </div>
+        
+        {/* Start New Session Button (appears when a winner exists) */}
+        {gameState.currentWinner && (
+          <div className="space-y-2 mt-4">
+            <Button
+              variant="outline"
+              className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+              onClick={handleStartNewSession}
+              disabled={!isConnected || isStartingNewSession}
+            >
+              {isStartingNewSession ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Starting New Session...
+                </>
+              ) : (
+                'Start New Staking Session'
+              )}
+            </Button>
+            <p className="text-xs text-neutral-500 text-center">
+              Resets the game to start a new staking round
+            </p>
+          </div>
+        )}
         
         <Separator />
         
