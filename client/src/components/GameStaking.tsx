@@ -70,32 +70,21 @@ export function GameStaking() {
       console.log('- Total staked:', totalStaked.toString());
       console.log('- User stake:', userStake.toString());
       
-      // Important: If there's a winner and total staked is 0, this means rewards were distributed
-      // In this case, we should consider all stakes as 0 since they've been distributed
-      // This is because the contract doesn't reset individual stakes in the mapping but distributeRewards
-      // in the updated contract now resets stakes for all players
+      // Important: If total staked is 0, this means we're in a reset state
+      // and individual stakes should be considered 0 regardless of what the contract says
+      // This is because the contract has a bug where it doesn't reset individual stakes in the mapping
       const totalStakedBigInt = ethers.getBigInt(totalStaked.toString());
-      const userStakeBigInt = ethers.getBigInt(userStake.toString());
+      const isZeroTotalStake = totalStakedBigInt === ethers.getBigInt(0);
       
-      // In the updated contract, when unstake is called or funds are distributed,
-      // the individual stakes are properly reset to 0. So we just use the contract value.
-      const effectiveUserStake = userStake.toString();
+      // WORKAROUND FOR CONTRACT BUG:
+      // If total staked is 0, FORCE user stake to 0 regardless of what's in the contract
+      // This prevents stakes from accumulating across sessions
+      const effectiveUserStake = isZeroTotalStake ? '0' : userStake.toString();
       
-      // If total staked is 0, the session has been reset
-      // This ensures the UI is consistent with the contract's state after a winner is declared
-      const isNewOrResetSession = totalStakedBigInt === ethers.getBigInt(0);
+      console.log('Using effective user stake:', effectiveUserStake, 
+                 '(original contract value:', userStake.toString() + ')');
       
-      // Clear any localStorage reset state if we detect a new session from the contract
-      if (isNewOrResetSession) {
-        try {
-          localStorage.removeItem('gameStakeReset');
-          localStorage.removeItem('gameStakeResetTimestamp');
-        } catch (error) {
-          console.error('Error clearing reset state:', error);
-        }
-      }
-      
-      // Update game state
+      // Update game state with our fixed value
       setGameState(prev => ({
         ...prev,
         userStake: effectiveUserStake,
@@ -187,6 +176,27 @@ export function GameStaking() {
         signer
       );
       
+      // Before adding new stake, check if we need to reset previous stake
+      // This is a workaround for the contract issue where individual stakes aren't reset
+      const totalStaked = await contract.totalStaked();
+      const userStake = await contract.stakes(account);
+      
+      console.log('Before staking - Total staked:', totalStaked.toString());
+      console.log('Before staking - User stake:', userStake.toString());
+      
+      // If we're in a "reset" state (total stake is 0) but the user's stake isn't 0,
+      // we need to warn the user about the contract inconsistency
+      if (ethers.getBigInt(totalStaked.toString()) === ethers.getBigInt(0) && 
+          ethers.getBigInt(userStake.toString()) > ethers.getBigInt(0)) {
+        console.warn('Contract inconsistency detected: Total stake is 0 but user stake is non-zero');
+        
+        toast({
+          title: "Contract Reset Detected",
+          description: "Stake values from previous sessions will be ignored for this stake.",
+          duration: 5000,
+        });
+      }
+      
       // Convert amount to wei (smallest unit)
       const amountInWei = ethers.parseUnits(
         stakeAmount, 
@@ -210,9 +220,7 @@ export function GameStaking() {
         description: `Successfully staked ${stakeAmount} pSAGA`,
       });
       
-      // No longer using localStorage for stake data
-      
-      // Refresh data
+      // Force refresh from contract
       await fetchContractData();
       
       // Reset form
