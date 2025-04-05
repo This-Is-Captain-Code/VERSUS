@@ -486,7 +486,7 @@ export function GameStaking() {
         <div className="space-y-2">
           <Button
             variant="outline"
-            className="w-full border-amber-500/50 text-amber-300 hover:bg-amber-800/20 hover:text-amber-200 neon-border"
+            className="w-full border-amber-500/70 bg-amber-900/30 text-amber-300 hover:bg-amber-800/40 hover:text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.4)] font-bold tracking-wide py-5"
             onClick={handleSetWinner}
             disabled={!isConnected || isSettingWinner}
           >
@@ -496,7 +496,10 @@ export function GameStaking() {
                 Setting Winner...
               </>
             ) : (
-              'Set Me as Winner'
+              <span className="relative z-10 flex items-center justify-center">
+                <span className="mr-2">🏆</span>
+                SET ME AS WINNER
+              </span>
             )}
           </Button>
           <p className="text-xs text-primary/70 text-center">
@@ -509,7 +512,7 @@ export function GameStaking() {
           <div className="space-y-2 mt-4">
             <Button
               variant="outline"
-              className="w-full border-emerald-500/50 text-emerald-300 hover:bg-emerald-800/20 hover:text-emerald-200 neon-border"
+              className="w-full border-emerald-500/70 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-800/40 hover:text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.4)] font-bold tracking-wide py-5"
               onClick={handleStartNewSession}
               disabled={!isConnected || isStartingNewSession}
             >
@@ -519,7 +522,10 @@ export function GameStaking() {
                   Starting New Session...
                 </>
               ) : (
-                'Start New Staking Session'
+                <span className="relative z-10 flex items-center justify-center">
+                  <span className="mr-2">🔄</span>
+                  START NEW STAKING SESSION
+                </span>
               )}
             </Button>
             <p className="text-xs text-primary/70 text-center">
@@ -553,7 +559,7 @@ export function GameStaking() {
           </div>
           
           <Button 
-            className="w-full bg-primary/80 hover:bg-primary neon-glow text-black font-bold" 
+            className="w-full bg-primary hover:bg-primary/90 neon-glow text-black font-bold tracking-wide py-5 text-base shadow-[0_0_15px_rgba(13,242,201,0.7)]" 
             onClick={handleStake}
             disabled={!isConnected || gameState.isStaking || parseFloat(stakeAmount) <= 0}
           >
@@ -563,7 +569,7 @@ export function GameStaking() {
                 Staking...
               </>
             ) : (
-              'Stake Tokens'
+              'STAKE TOKENS'
             )}
           </Button>
         </div>
@@ -571,7 +577,7 @@ export function GameStaking() {
       
       <CardFooter className="bg-gradient-to-r from-primary/20 to-purple-700/20 p-6 flex flex-col border-t border-primary/30">
         <Button
-          className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-black font-bold py-6 text-lg uppercase tracking-wider neon-glow"
+          className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-black font-bold py-6 text-lg uppercase tracking-wider shadow-[0_0_20px_rgba(13,242,201,0.8),0_0_30px_rgba(127,58,236,0.5)]"
           onClick={handleEnterGame}
           disabled={!isConnected || ethers.getBigInt(gameState.userStake) <= ethers.getBigInt(0) || isEntering}
         >
@@ -581,7 +587,10 @@ export function GameStaking() {
               Entering...
             </>
           ) : (
-            'ENTER THE GAME'
+            <span className="relative z-10 flex items-center justify-center">
+              <span className="mr-2">🎮</span>
+              ENTER THE GAME
+            </span>
           )}
         </Button>
         
