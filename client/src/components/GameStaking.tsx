@@ -54,19 +54,27 @@ export function GameStaking() {
         provider
       );
 
-      // Get user stake
-      const userStake = await contract.stakes(account);
+      // Get current winner first
+      const winner = await contract.winner();
       
       // Get total staked
       const totalStaked = await contract.totalStaked();
       
-      // Get current winner
-      const winner = await contract.winner();
+      // Get user stake
+      const userStake = await contract.stakes(account);
+      
+      // Important: If there's a winner and total staked is 0, this means rewards were distributed
+      // In this case, we should consider all stakes as 0 since they've been distributed
+      // This is because the contract doesn't reset individual stakes in the mapping
+      const effectiveUserStake = 
+        (winner !== ethers.ZeroAddress && ethers.getBigInt(totalStaked.toString()) === ethers.getBigInt(0)) 
+          ? '0' 
+          : userStake.toString();
       
       // Update game state
       setGameState(prev => ({
         ...prev,
-        userStake: userStake.toString(),
+        userStake: effectiveUserStake,
         totalStaked: totalStaked.toString(),
         currentWinner: winner === ethers.ZeroAddress ? null : winner,
       }));
@@ -257,12 +265,21 @@ export function GameStaking() {
       
       await tx.wait();
       
+      // After setting winner, the contract distributes all staked tokens to the winner
+      // So we can immediately update our UI to reflect that
+      setGameState(prev => ({
+        ...prev,
+        userStake: '0',  // Individual stakes should be shown as 0 since funds were distributed
+        totalStaked: '0', // Total staked is reset in the contract
+        currentWinner: account
+      }));
+      
       toast({
         title: "Winner Set",
-        description: "You have been set as the winner!",
+        description: "You have been set as the winner! All staked tokens have been distributed.",
       });
       
-      // Refresh contract data
+      // Refresh contract data to ensure everything is in sync
       await fetchContractData();
       
     } catch (error: any) {
@@ -336,7 +353,9 @@ export function GameStaking() {
         signer
       );
       
-      // Set winner to zero address to reset the game
+      // For resetting the game, we set the winner to zero address
+      // This will actually trigger distributeRewards() in the contract, but since 
+      // the winner is the zero address, the tokens will be effectively burned
       const tx = await contract.setWinner(ethers.ZeroAddress);
       
       toast({
@@ -346,13 +365,14 @@ export function GameStaking() {
       
       await tx.wait();
       
-      // For this specific contract, we need to manually update our state
-      // Since the contract doesn't have a way to reset stakes directly
+      // After setting zero address as winner, all funds have been distributed (burned)
+      // The contract will have totalStaked = 0, but individual stakes remain in the mapping
+      // We need to update our UI to reflect the new state properly
       setGameState(prev => ({
         ...prev,
-        userStake: '0',
-        totalStaked: '0',
-        currentWinner: null
+        userStake: '0',  // We reset this in UI to match the contract behavior
+        totalStaked: '0', // This is reset in the contract
+        currentWinner: null  // No winner now
       }));
       
       toast({
@@ -360,13 +380,13 @@ export function GameStaking() {
         description: "Ready for new staking round!",
       });
       
-      // Refresh contract data to confirm changes
+      // Refresh contract data to ensure everything is in sync
       await fetchContractData();
       
       // Additional notification about the stakes
       toast({
         title: "Note on Stakes",
-        description: "Your stake has been reset in the UI. You can add new stakes now.",
+        description: "All stakes have been reset. You can add new stakes for the new session.",
         duration: 5000,
       });
       
