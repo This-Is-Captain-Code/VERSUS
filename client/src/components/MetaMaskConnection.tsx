@@ -1,22 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMetaMask } from '@/hooks/useMetaMask';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PSAGA_CHAINLET_CONFIG } from '@/lib/chainConfig';
-import { AlertCircle, Check, Copy, ExternalLink, Loader2, Wallet } from 'lucide-react';
+import { 
+  AlertCircle, 
+  Check, 
+  Copy, 
+  ExternalLink, 
+  Loader2, 
+  RefreshCw, 
+  Wallet 
+} from 'lucide-react';
 
 export function MetaMaskConnection() {
   const { 
     isConnected, 
     isConnecting, 
     account, 
-    error, 
+    error,
+    tokenBalances,
+    isLoadingBalances,
+    refreshBalances,
     connectWallet, 
     copyToClipboard 
   } = useMetaMask();
   
   const [copied, setCopied] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleCopyAddress = async () => {
     if (account) {
@@ -28,8 +40,26 @@ export function MetaMaskConnection() {
     }
   };
 
+  const handleRefreshBalances = async () => {
+    setRefreshing(true);
+    await refreshBalances();
+    setTimeout(() => setRefreshing(false), 1000);
+  };
+
   const shortenAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
+  // Format token balance for display
+  const formatBalance = (balance: string) => {
+    // If the balance is less than 0.0001, display scientific notation
+    const num = parseFloat(balance);
+    if (num < 0.0001 && num > 0) {
+      return num.toExponential(4);
+    }
+    
+    // Format with 6 decimal places max and trim trailing zeros
+    return parseFloat(num.toFixed(6)).toString();
   };
 
   return (
@@ -91,6 +121,46 @@ export function MetaMaskConnection() {
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Token Balances */}
+        {isConnected && (
+          <div className="border border-neutral-200 rounded-lg p-4 mb-6 bg-neutral-50">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-medium text-neutral-700">Token Balances</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={handleRefreshBalances}
+                disabled={isLoadingBalances || refreshing}
+              >
+                <RefreshCw className={`h-3.5 w-3.5 mr-1 ${(isLoadingBalances || refreshing) ? 'animate-spin' : ''}`} />
+                <span className="text-xs">Refresh</span>
+              </Button>
+            </div>
+            
+            {isLoadingBalances ? (
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : tokenBalances.length > 0 ? (
+              <div className="space-y-2">
+                {tokenBalances.map((token, index) => (
+                  <div key={index} className="bg-white p-3 rounded-lg border border-neutral-200">
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm font-medium text-neutral-800">{token.symbol}</div>
+                      <div className="text-sm font-bold">{formatBalance(token.formatted)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-sm text-neutral-500">
+                No token balances found
+              </div>
+            )}
           </div>
         )}
 
